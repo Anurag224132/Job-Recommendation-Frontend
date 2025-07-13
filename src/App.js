@@ -1,24 +1,60 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import StudentDashboard from './pages/StudentDashboard';
+import RecruiterDashboard from './pages/RecruiterDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import Login from './pages/Login';
+import Signup from './pages/signup';
+import PrivateRoute from './components/PrivateRoute';
+import RecentJobsPage from './pages/RecentJobsPage';
+import StudentApplicationsManager from './components/student/StudentApplicationsManager';
+
+const DashboardRouter = () => {
+  const { currentUser } = useAuth();
+
+  if (!currentUser) {
+    return <div className="text-center mt-10 text-gray-600">Loading dashboard...</div>;
+  }
+
+  if (currentUser.role === 'recruiter') {
+    return <RecruiterDashboard />;
+  } else if (currentUser.role === 'admin') {
+    return <AdminDashboard />;
+  } else if (currentUser.role === 'student') {
+    return <StudentDashboard />;
+  } else {
+    return (
+      <div className="text-center mt-10 text-red-600">
+        Unauthorized: Unknown user role.
+      </div>
+    );
+  }
+};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <AuthProvider>
+        <div className="min-h-screen bg-gray-50">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/Signup" element={<Signup />} />
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <DashboardRouter />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/recent-jobs" element={<RecentJobsPage />} />
+            <Route path="/student/dashboard" element={<StudentDashboard />} />
+            <Route path="/student/applications/manage" element={<StudentApplicationsManager />} />  
+
+          </Routes>
+        </div>
+      </AuthProvider>
+    </Router>
   );
 }
 
