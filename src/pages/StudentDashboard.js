@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import axios from '../api';
 import JobCard from '../components/JobCard';
 import UploadResume from '../components/UploadResume';
 import StudentAnalytics from '../components/student/StudentAnalytics';

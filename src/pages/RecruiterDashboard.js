@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../api';
 import PostJob from '../components/recruiter/PostJob';
 import ManageJobs from '../components/recruiter/ManageJobs';
 import ViewApplicants from '../components/recruiter/ViewApplicants';
