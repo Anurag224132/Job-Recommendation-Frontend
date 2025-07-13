@@ -4,7 +4,7 @@ import StudentDashboard from './pages/StudentDashboard';
 import RecruiterDashboard from './pages/RecruiterDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
-import Signup from './pages/signup';
+import Signup from './pages/Signup';
 import PrivateRoute from './components/PrivateRoute';
 import RecentJobsPage from './pages/RecentJobsPage';
 import StudentApplicationsManager from './components/student/StudentApplicationsManager';
@@ -49,7 +49,7 @@ function App() {
             />
             <Route path="/recent-jobs" element={<RecentJobsPage />} />
             <Route path="/student/dashboard" element={<StudentDashboard />} />
-            <Route path="/student/applications/manage" element={<StudentApplicationsManager />} />  
+            <Route path="/student/applications/manage" element={<StudentApplicationsManager />} />
 
           </Routes>
         </div>
