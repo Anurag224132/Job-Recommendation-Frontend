@@ -4,13 +4,12 @@ import StudentDashboard from './pages/StudentDashboard';
 import RecruiterDashboard from './pages/RecruiterDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
-import Signup from './pages/Signup';
 import PrivateRoute from './components/PrivateRoute';
 import RecentJobsPage from './pages/RecentJobsPage';
 import StudentApplicationsManager from './components/student/StudentApplicationsManager';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-
+import Signup from './pages/Signup';
 
 const DashboardRouter = () => {
   const { currentUser } = useAuth();
@@ -55,6 +54,7 @@ function App() {
             <Route path="/student/applications/manage" element={<StudentApplicationsManager />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            
 
           </Routes>
         </div>

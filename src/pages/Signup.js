@@ -35,7 +35,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/register`, { name, email, password, role });
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, { name, email, password, role });
       if (response.data.nextStep === 'verify-otp') {
         setStep('verify');
       } else {
@@ -59,7 +59,7 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/verify-otp`, { email, otp, name, password, role });
+      const response = await axios.post(`${API_BASE_URL}/api/auth/verify-otp`, { email, otp, name, password, role });
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         alert('Registration successful! You are now logged in.');
@@ -76,11 +76,12 @@ const Signup = () => {
     }
   };
 
+
   const handleResendOtp = async () => {
     setError('');
     setLoading(true);
     try {
-      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/resend-otp`, { email });
+      await axios.post(`${API_BASE_URL}/api/auth/resend-otp`, { email });
       alert('OTP resent to your email.');
     } catch (err) {
       setError(
@@ -151,7 +152,6 @@ const Signup = () => {
                     {showPassword ? '🙈' : '👁️'}
                   </button>
                 </div>
-
               </div>
               <div className="space-y-2">
                 <label htmlFor="role" className="block text-sm font-semibold text-gray-700">I am a...</label>
