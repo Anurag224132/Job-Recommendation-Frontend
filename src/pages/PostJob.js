@@ -19,8 +19,7 @@ const PostJob = () => {
     console.log('Token:', token);
 
     try {
-      await axios.post(
-        '/api/jobs',
+      axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/jobs`,
         {
           title,
           description,

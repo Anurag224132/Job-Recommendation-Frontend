@@ -23,9 +23,9 @@ const AdminDashboard = () => {
             const headers = { Authorization: `Bearer ${token}` };
 
             const [metricsRes, usersRes, jobsRes] = await Promise.all([
-                axios.get('/api/admin/metrics', { headers }),
-                axios.get('/api/admin/users', { headers }),
-                axios.get('/api/admin/jobs', { headers }),
+                axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/metrics`, { headers }),
+                axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/users`, { headers }),
+                axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/jobs`, { headers }),
             ]);
 
             setMetrics(metricsRes.data);
@@ -46,7 +46,7 @@ const AdminDashboard = () => {
             setError(null);
             const token = localStorage.getItem('token');
 
-            const response = await axios.get(`/api/admin/users/${userId}/analytics`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/users/${userId}/analytics`, {
                 headers: { Authorization: `Bearer ${token}` },
                 timeout: 10000
             });
@@ -106,7 +106,7 @@ const AdminDashboard = () => {
             setJobDetails(null);
 
             const token = localStorage.getItem('token');
-            const response = await axios.get(`/api/admin/jobs/${jobId}/details`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/jobs/${jobId}/details`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -149,7 +149,7 @@ const AdminDashboard = () => {
         if (!window.confirm('Are you sure you want to delete this user?')) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`/api/admin/users/${userId}`, {
+            await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/admin/users/${userId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setUsers(users.filter(user => user._id !== userId));
@@ -163,8 +163,7 @@ const AdminDashboard = () => {
     const handleChangeUserRole = async (userId, newRole) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.patch(
-                `/api/admin/users/${userId}/role`,
+            await axios.patch(`${process.env.REACT_APP_API_BASE_URL}/api/admin/users/${userId}/role`,
                 { role: newRole },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -184,7 +183,7 @@ const AdminDashboard = () => {
         if (!window.confirm('Are you sure you want to delete this job?')) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`/api/admin/jobs/${jobId}`, {
+            await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/admin/jobs/${jobId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setJobs(jobs.filter(job => job._id !== jobId));

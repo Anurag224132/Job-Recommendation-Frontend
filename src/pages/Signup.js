@@ -22,8 +22,7 @@ const Signup = () => {
 
     try {
       console.log({ name, email, password, role }); // debug payload being sent
-
-      await axios.post('/api/auth/register', { name, email, password, role });
+      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/register`, { name, email, password, role });
       
       alert('Signup successful! Please login.');
       navigate('/login');

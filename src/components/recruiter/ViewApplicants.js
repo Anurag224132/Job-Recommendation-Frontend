@@ -20,7 +20,7 @@ const ViewApplicants = () => {
     const fetchApplicants = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${API_BASE_URL}/api/applications/recruiter/${currentUser._id}`, {
+            const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/applications/recruiter/${currentUser._id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setApplications(res.data);
@@ -44,8 +44,7 @@ const ViewApplicants = () => {
 
     const handleDownloadResume = async (applicationId, applicantName) => {
         try {
-            const response = await axios.get(
-                `${API_BASE_URL}/api/applications/${applicationId}/download-resume`,
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/applications/${applicationId}/download-resume`,
                 {
                     responseType: 'blob',
                     headers: { Authorization: `Bearer ${token}` }
@@ -97,8 +96,7 @@ const ViewApplicants = () => {
 
     const handleStatusChange = async (appId, newStatus, notes = '') => {
         try {
-            await axios.put(
-                `${API_BASE_URL}/api/applications/${appId}/status`,
+            await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/applications/${appId}/status`,
                 { status: newStatus, notes },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -122,8 +120,7 @@ const ViewApplicants = () => {
 
         try {
             // Schedule interview and send email
-            const response = await axios.put(
-                `${API_BASE_URL}/api/applications/${currentApplication._id}/schedule-interview`,
+            const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/applications/${currentApplication._id}/schedule-interview`,
                 { interviewDate },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

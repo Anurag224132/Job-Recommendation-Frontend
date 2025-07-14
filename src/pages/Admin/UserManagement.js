@@ -6,7 +6,7 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('/api/admin/users');
+      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/users`);
       setUsers(res.data);
     } catch (err) {
       console.error('Error fetching users:', err);
@@ -16,7 +16,7 @@ const UserManagement = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete user?')) return;
     try {
-      await axios.delete(`/api/admin/users/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/admin/users/${id}`);
       setUsers(users.filter(user => user._id !== id));
     } catch (err) {
       console.error('Error deleting user:', err);

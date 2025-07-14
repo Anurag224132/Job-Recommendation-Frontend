@@ -66,13 +66,13 @@ const JobDetails = ({ jobId, onClose }) => {
                 setIsLoading(true);
 
                 // Fetch job details
-                const jobRes = await axios.get(`/api/jobs/${jobId}`);
+                const jobRes = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/jobs/${jobId}`);
                 setJob(jobRes.data.data);
 
                 // Fetch application if user is logged in
                 if (currentUser) {
                     try {
-                        const appRes = await axios.get(`/api/applications/check`, {
+                        const appRes = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/applications/check`, {
                             params: { jobId },
                             headers: {
                                 Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -104,7 +104,7 @@ const JobDetails = ({ jobId, onClose }) => {
             const token = localStorage.getItem('token');
 
             // First calculate fit score
-            const fitRes = await axios.post('/api/applications/calculate-fit', {
+            const fitRes = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/applications/calculate-fit`, {
                 resumeSkills: currentUser.skills || [],
                 jobId: jobId
             }, {
@@ -112,8 +112,7 @@ const JobDetails = ({ jobId, onClose }) => {
             });
 
             // Then submit application
-            const res = await axios.post(
-                '/api/applications',
+            const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/applications`,
                 {
                     jobId: jobId,
                     fitScore: fitRes.data.score

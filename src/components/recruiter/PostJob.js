@@ -22,7 +22,7 @@ const PostJob = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('/api/jobs', {
+      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/jobs`, {
         title,
         description,
         requiredSkills: requiredSkills.split(',').map(s => s.trim()),

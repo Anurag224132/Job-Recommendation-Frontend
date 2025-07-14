@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const tokenInStorage = localStorage.getItem('token');
     if (tokenInStorage) {
-      axios.get('/api/auth/user', {
+      axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/auth/user`, {
         headers: { Authorization: `Bearer ${tokenInStorage}` }
       })
       .then(res => setCurrentUser(res.data))
@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const res = await axios.post('/api/auth/login', { email, password });
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login`, { email, password });
       localStorage.setItem('token', res.data.token);
       setToken(res.data.token);
       setCurrentUser(res.data.user);

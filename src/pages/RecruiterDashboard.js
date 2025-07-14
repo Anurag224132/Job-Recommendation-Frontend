@@ -24,7 +24,7 @@ const RecruiterDashboard = () => {
       const fetchAnalytics = async () => {
         setLoadingAnalytics(true);
         try {
-          const res = await axios.get('/api/admin/analytics', {
+          const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/analytics`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setAnalyticsData(res.data);
@@ -44,7 +44,7 @@ const RecruiterDashboard = () => {
       const fetchSkillGaps = async () => {
         setLoadingSkillGaps(true);
         try {
-          const res = await axios.get('/api/admin/skill-gaps', {
+          const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/skill-gaps`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setSkillGaps(res.data.gaps || []);

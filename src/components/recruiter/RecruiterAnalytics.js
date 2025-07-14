@@ -13,7 +13,7 @@ const RecruiterAnalytics = () => {
                 const token = localStorage.getItem('token');
                 console.log("📦 Token being sent:", token);
 
-                const res = await axios.get('/api/recruiter/analytics', {
+                const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/recruiter/analytics`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 console.log("✅ Analytics Data Fetched:", res.data);

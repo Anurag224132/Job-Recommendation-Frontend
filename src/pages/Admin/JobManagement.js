@@ -6,7 +6,7 @@ const JobManagement = () => {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get('/api/jobs');
+      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/jobs`);
       setJobs(res.data);
     } catch (err) {
       console.error('Error fetching jobs:', err);
@@ -16,7 +16,7 @@ const JobManagement = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete job?')) return;
     try {
-      await axios.delete(`/api/admin/jobs/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/admin/jobs/${id}`);
       setJobs(jobs.filter(job => job._id !== id));
     } catch (err) {
       console.error('Error deleting job:', err);

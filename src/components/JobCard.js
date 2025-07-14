@@ -21,7 +21,7 @@ const JobCard = ({ job, userSkills = [], onJobClick }) => {
   const calculateFitScore = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post('/api/applications/calculate-fit', {
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/applications/calculate-fit`, {
         resumeSkills: userSkills,
         jobId: job._id,
       });
@@ -53,8 +53,7 @@ const JobCard = ({ job, userSkills = [], onJobClick }) => {
       throw new Error('No authentication token found');
     }
 
-    const response = await axios.post(
-      '/api/applications',
+    const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/applications`,
       {
         jobId: job._id,
         fitScore: fitScore

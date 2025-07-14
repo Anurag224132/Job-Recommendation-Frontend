@@ -11,7 +11,7 @@ const ManageJobs = () => {
   const fetchJobs = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('/api/jobs/myjobs', {
+      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/jobs/myjobs`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setJobs(res.data);
@@ -37,7 +37,7 @@ const ManageJobs = () => {
     if (!window.confirm('Are you sure you want to delete this job?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`/api/jobs/${jobId}`, {
+      await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/jobs/${jobId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setJobs(jobs.filter((job) => job._id !== jobId));

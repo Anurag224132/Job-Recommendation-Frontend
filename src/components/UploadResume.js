@@ -23,7 +23,7 @@ const UploadResume = ({ onParsed }) => {
       const formData = new FormData();
       formData.append('resume', file);
 
-      const res = await axios.post('/api/resumes', formData, {
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/resumes`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${localStorage.getItem('token')}`

@@ -12,7 +12,7 @@ const StudentApplicationsManager = () => {
   const fetchApplications = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/applications/mine');
+      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/applications/mine`);
       setApplications(res.data);
     } catch (err) {
       console.error('❌ Error fetching applications:', err.response?.data || err.message);

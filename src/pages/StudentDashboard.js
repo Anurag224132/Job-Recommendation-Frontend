@@ -46,7 +46,7 @@ const StudentDashboard = () => {
       if (!hasUploadedResume) return;
       setLoading(true);
       try {
-        const jobsRes = await axios.get('/api/jobs');
+        const jobsRes = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/jobs`);
         const allJobs = jobsRes.data;
 
         // If no skills, show all jobs with a warning
@@ -78,7 +78,7 @@ const StudentDashboard = () => {
       } catch (err) {
         console.error('Error:', err);
         // Fallback: Show all jobs if matching fails
-        const jobsRes = await axios.get('/api/jobs');
+        const jobsRes = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/jobs`);
         setJobs(jobsRes.data);
       } finally {
         setLoading(false);
@@ -96,7 +96,7 @@ const StudentDashboard = () => {
       if (!currentUser?._id) return;
       setAppliedJobsLoading(true);
       try {
-        const res = await axios.get(`/api/applications/user/${currentUser._id}`);
+        const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/applications/user/${currentUser._id}`);
         const filtered = res.data.filter(app => app.job).map(app => ({
           ...app,
           status: app.status.toLowerCase()
