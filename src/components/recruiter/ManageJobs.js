@@ -1,6 +1,6 @@
 // src/components/recruiter/ManageJobs.js
 import { useEffect, useState } from 'react';
-import axios from '../../api';
+import axios from 'axios';
 
 const ManageJobs = () => {
   const [jobs, setJobs] = useState([]);

@@ -1,6 +1,6 @@
 // src/components/recruiter/PostJob.js
 import { useState } from 'react';
-import axios from '../../api';
+import axios from 'axios';
 
 const PostJob = () => {
   // Existing state

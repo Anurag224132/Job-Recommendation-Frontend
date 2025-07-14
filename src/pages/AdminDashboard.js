@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from '../api';
+import axios from 'axios';
 import LogoutButton from '../components/LogoutButton';
 
 const AdminDashboard = () => {

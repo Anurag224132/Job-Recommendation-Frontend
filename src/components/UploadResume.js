@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from '../api';
+import axios from 'axios';
 
 const UploadResume = ({ onParsed }) => {
   const [file, setFile] = useState(null);

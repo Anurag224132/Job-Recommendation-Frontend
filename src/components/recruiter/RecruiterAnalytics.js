@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from '../../api';
+import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 const RecruiterAnalytics = () => {

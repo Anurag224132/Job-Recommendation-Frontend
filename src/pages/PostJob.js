@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import axios from '../api';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext'; // if you store token here
 
 const PostJob = () => {

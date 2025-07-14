@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import axios from '../api';
 import JobCard from '../components/JobCard';
 import UploadResume from '../components/UploadResume';
 import StudentAnalytics from '../components/student/StudentAnalytics';
@@ -8,7 +7,7 @@ import ProfileSection from '../components/student/ProfileSection';
 import LogoutButton from '../components/LogoutButton';
 import { useNavigate } from 'react-router-dom';
 import JobDetails from '../components/student/JobDetails';
-import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 const StudentDashboard = () => {
   const { currentUser } = useAuth();

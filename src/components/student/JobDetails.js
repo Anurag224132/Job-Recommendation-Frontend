@@ -1,6 +1,6 @@
 // src/components/job/JobDetails.js
 import { useState, useEffect, useRef } from 'react';
-import axios from '../../api';
+import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 
 const JobDetails = ({ jobId, onClose }) => {

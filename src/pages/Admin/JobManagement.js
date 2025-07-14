@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from '../../api';
+import axios from 'axios';
 
 const JobManagement = () => {
   const [jobs, setJobs] = useState([]);
