@@ -99,7 +99,7 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full p-3 pr-12 rounded-xl border-2 border-gray-200 focus:border-blue-500 bg-gray-50 focus:bg-white"
-                    placeholder="Create a strong password"
+                    placeholder="Enter password"
                   />
                   <button
                     type="button"
