@@ -8,7 +8,7 @@ import LogoutButton from '../components/LogoutButton';
 import { useNavigate } from 'react-router-dom';
 import JobDetails from '../components/student/JobDetails';
 import axios from 'axios';
-
+import { useParams } from 'react-router-dom';
 const StudentDashboard = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
