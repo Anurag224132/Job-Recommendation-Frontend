@@ -124,8 +124,8 @@ const ProfileSection = () => {
             <button
               onClick={() => (editing ? handleSave() : setEditing(true))}
               className={`w-full py-3 rounded-xl font-semibold transition ${editing
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600'
-                  : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600'
+                ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600'
+                : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600'
                 }`}
             >
               {editing ? 'Save Profile' : 'Edit Profile'}

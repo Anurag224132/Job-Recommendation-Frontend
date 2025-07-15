@@ -278,7 +278,7 @@ const JobDetails = ({ jobId, onClose }) => {
                         <div className="bg-slate-800/50 p-4 rounded-xl">
                             <div className="text-slate-400 text-sm">Posted On</div>
                             <div className="text-white">
-                                 {new Date(job.createdAt || job.postedDate).toLocaleDateString()}
+                                {new Date(job.createdAt || job.postedDate).toLocaleDateString()}
                             </div>
                         </div>
 

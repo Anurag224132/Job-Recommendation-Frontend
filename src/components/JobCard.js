@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 const JobCard = ({ job, userSkills = [], onJobClick }) => {
-  
+
   const { currentUser } = useAuth();
   const [fitScore, setFitScore] = useState(null);
   const [applied, setApplied] = useState(false);
@@ -34,55 +34,55 @@ const JobCard = ({ job, userSkills = [], onJobClick }) => {
   };
 
   const handleApply = async (e) => {
-  e.stopPropagation();
-  
-  if (!currentUser?._id) {
-    alert('Please log in to apply for jobs');
-    return;
-  }
+    e.stopPropagation();
 
-  if (fitScore === null) {
-    alert('Please wait while we calculate your fit score');
-    return;
-  }
-
-  setApplying(true);
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('No authentication token found');
+    if (!currentUser?._id) {
+      alert('Please log in to apply for jobs');
+      return;
     }
 
-    const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/applications`,
-      {
-        jobId: job._id,
-        fitScore: fitScore
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
+    if (fitScore === null) {
+      alert('Please wait while we calculate your fit score');
+      return;
+    }
+
+    setApplying(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
       }
-    );
 
-    if (response.data && response.data.application) {
-      setApplied(true);
-      alert('✅ Application submitted successfully!');
-    } else {
-      throw new Error('Invalid response from server');
+      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/applications`,
+        {
+          jobId: job._id,
+          fitScore: fitScore
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data && response.data.application) {
+        setApplied(true);
+        alert('✅ Application submitted successfully!');
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Application error:', error);
+      const errorMessage = error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to submit application';
+      alert(`Application failed: ${errorMessage}`);
+    } finally {
+      setApplying(false);
     }
-  } catch (error) {
-    console.error('Application error:', error);
-    const errorMessage = error.response?.data?.error || 
-                        error.response?.data?.message || 
-                        error.message || 
-                        'Failed to submit application';
-    alert(`Application failed: ${errorMessage}`);
-  } finally {
-    setApplying(false);
-  }
-};
+  };
 
   const getFitScoreColor = (score) => {
     if (score >= 80) return 'from-emerald-500 to-green-400';
@@ -169,7 +169,7 @@ const JobCard = ({ job, userSkills = [], onJobClick }) => {
       {/* Popup Modal */}
       {showPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div 
+          <div
             className="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
@@ -215,11 +215,10 @@ const JobCard = ({ job, userSkills = [], onJobClick }) => {
                   {job.requiredSkills?.map((skill, idx) => (
                     <span
                       key={idx}
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        userSkills.includes(skill)
-                          ? 'bg-emerald-500/20 text-emerald-300'
-                          : 'bg-slate-700 text-slate-300'
-                      }`}
+                      className={`px-3 py-1 rounded-full text-sm ${userSkills.includes(skill)
+                        ? 'bg-emerald-500/20 text-emerald-300'
+                        : 'bg-slate-700 text-slate-300'
+                        }`}
                     >
                       {skill}
                     </span>
@@ -274,15 +273,14 @@ const JobCard = ({ job, userSkills = [], onJobClick }) => {
               <button
                 onClick={handleApply}
                 disabled={applied || applying || fitScore === null}
-                className={`w-full py-3 rounded-xl font-semibold transition ${
-                  applied
-                    ? 'bg-green-600 text-white cursor-not-allowed'
-                    : applying
+                className={`w-full py-3 rounded-xl font-semibold transition ${applied
+                  ? 'bg-green-600 text-white cursor-not-allowed'
+                  : applying
                     ? 'bg-gray-500 text-white cursor-not-allowed'
                     : fitScore === null
-                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white hover:opacity-90'
-                }`}
+                      ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white hover:opacity-90'
+                  }`}
               >
                 {applied ? '✅ Applied' : applying ? 'Applying...' : '🚀 Apply Now'}
               </button>
