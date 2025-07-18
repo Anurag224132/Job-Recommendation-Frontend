@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import JobCard from '../components/JobCard';
+import JobCard from './JobCard'
 import { useNavigate } from 'react-router-dom';
 
 const RecentJobsPage = () => {

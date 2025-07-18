@@ -5,10 +5,10 @@ import RecruiterDashboard from './pages/RecruiterDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
 import PrivateRoute from './components/PrivateRoute';
-import RecentJobsPage from './pages/RecentJobsPage';
+import RecentJobsPage from './components/student/RecentJobsPage';
 import StudentApplicationsManager from './components/student/StudentApplicationsManager';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
+import ForgotPassword from './components/login/ForgotPassword';
+import ResetPassword from './components/login/ResetPassword';
 import Signup from './pages/Signup';
 
 const DashboardRouter = () => {
@@ -51,10 +51,10 @@ function App() {
             />
             <Route path="/recent-jobs" element={<RecentJobsPage />} />
             <Route path="/student/dashboard" element={<StudentDashboard />} />
-            <Route path="/student/applications/manage" element={<StudentApplicationsManager />} />
+            {/* <Route path="/student/applications/manage" element={<StudentApplicationsManager />} /> */}
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
-            
+
 
           </Routes>
         </div>

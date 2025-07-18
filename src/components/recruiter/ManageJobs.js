@@ -7,6 +7,8 @@ const ManageJobs = () => {
   // const [deletingId, setDeletingId] = useState(null);
   const [selectedJob, setSelectedJob] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState(null);
 
   const fetchJobs = async () => {
     const token = localStorage.getItem('token');
@@ -38,6 +40,11 @@ const ManageJobs = () => {
   const openJobDetails = (job) => {
     setSelectedJob(job);
     setShowModal(true);
+  };
+
+  const openEditJobModal = (job) => {
+    setEditFormData({ ...job });
+    setEditModalOpen(true);
   };
 
   useEffect(() => { fetchJobs(); }, []);
@@ -101,7 +108,7 @@ const ManageJobs = () => {
                     </div>
 
                     <div>
-                      
+
                       <p className="text-slate-600 mb-4 leading-relaxed line-clamp-2">{job.companyName} • Posted by {job.recruiterName}</p>
                     </div>
 
@@ -174,6 +181,10 @@ const ManageJobs = () => {
                       </svg>
                       View Details
                     </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openEditJobModal(job); }}
+                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl"
+                    >Edit</button>
                   </div>
                 </div>
               </div>
@@ -312,6 +323,62 @@ const ManageJobs = () => {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+        {/* Edit Job Modal */}
+        {editModalOpen && editFormData && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white p-8 rounded-xl w-full max-w-lg relative">
+              <button onClick={() => setEditModalOpen(false)} className="absolute top-4 right-4">❌</button>
+              <h2 className="text-2xl font-bold mb-4">Edit Job</h2>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const token = localStorage.getItem('token');
+                  try {
+                    await axios.put(
+                      `${process.env.REACT_APP_API_BASE_URL}/api/jobs/${editFormData._id}`,
+                      editFormData,
+                      { headers: { Authorization: `Bearer ${token}` } }
+                    );
+                    setEditModalOpen(false);
+                    fetchJobs();
+                  } catch (err) {
+                    console.error(err);
+                    alert('Failed to update job');
+                  }
+                }}
+                className="space-y-4"
+              >
+                <input type="text" value={editFormData.title}
+                  onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                  className="w-full p-2 border rounded"
+                  placeholder="Title"
+                />
+                <textarea value={editFormData.description}
+                  onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                  className="w-full p-2 border rounded"
+                  placeholder="Description"
+                  rows={4}
+                />
+                <input type="text" value={editFormData.location}
+                  onChange={(e) => setEditFormData({ ...editFormData, location: e.target.value })}
+                  className="w-full p-2 border rounded"
+                  placeholder="Location"
+                />
+                <input type="text" value={editFormData.salary}
+                  onChange={(e) => setEditFormData({ ...editFormData, salary: e.target.value })}
+                  className="w-full p-2 border rounded"
+                  placeholder="Salary"
+                />
+                <input type="text" value={editFormData.requiredSkills.join(', ')}
+                  onChange={(e) => setEditFormData({ ...editFormData, requiredSkills: e.target.value.split(',').map(s => s.trim()) })}
+                  className="w-full p-2 border rounded"
+                  placeholder="Required Skills"
+                />
+                <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Save Changes</button>
+              </form>
             </div>
           </div>
         )}

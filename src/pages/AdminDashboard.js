@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import LogoutButton from '../components/LogoutButton';
-
+import JobManagement from '../components/Admin/JobManagement';
+import AnalyticsCard from '../components/Admin/AnalyticsCard';
 const AdminDashboard = () => {
     const [metrics, setMetrics] = useState({});
     const [users, setUsers] = useState([]);
@@ -99,29 +100,29 @@ const AdminDashboard = () => {
         }
     }, []);
 
-    const fetchJobDetails = async (jobId) => {
-        try {
-            setDetailsLoading(true);
-            setError(null);
-            setJobDetails(null);
+    // const fetchJobDetails = async (jobId) => {
+    //     try {
+    //         setDetailsLoading(true);
+    //         setError(null);
+    //         setJobDetails(null);
 
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/jobs/${jobId}/details`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+    //         const token = localStorage.getItem('token');
+            // const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/jobs/${jobId}/details`, {
+            //     headers: { Authorization: `Bearer ${token}` }
+            // });
 
-            if (!response.data) {
-                throw new Error('No data received');
-            }
+    //         if (!response.data) {
+    //             throw new Error('No data received');
+    //         }
 
-            setJobDetails(response.data);
-        } catch (err) {
-            console.error('Error fetching job details:', err);
-            setError(err.response?.data?.message || 'Failed to load job details. Please try again.');
-        } finally {
-            setDetailsLoading(false);
-        }
-    };
+    //         setJobDetails(response.data);
+    //     } catch (err) {
+    //         console.error('Error fetching job details:', err);
+    //         setError(err.response?.data?.message || 'Failed to load job details. Please try again.');
+    //     } finally {
+    //         setDetailsLoading(false);
+    //     }
+    // };
 
     const handleViewUserDetails = (user) => {
         setSelectedJob(null);
@@ -130,12 +131,12 @@ const AdminDashboard = () => {
         fetchUserAnalytics(user._id);
     };
 
-    const handleViewJobDetails = (job) => {
-        setSelectedUser(null);
-        setUserAnalytics(null);
-        setSelectedJob(job);
-        fetchJobDetails(job._id);
-    };
+    // const handleViewJobDetails = (job) => {
+    //     setSelectedUser(null);
+    //     setUserAnalytics(null);
+    //     setSelectedJob(job);
+    //     fetchJobDetails(job._id);
+    // };
 
     const handleCloseModal = () => {
         setSelectedUser(null);
@@ -237,6 +238,7 @@ const AdminDashboard = () => {
     }
 
     return (
+        
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 px-4 py-8">
             {/* Animated Background Elements */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -712,7 +714,7 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Metrics Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {Object.entries(metrics).map(([key, value], index) => {
                         const colors = [
                             'from-emerald-500 to-teal-500',
@@ -745,8 +747,9 @@ const AdminDashboard = () => {
                                 </h3>
                             </div>
                         );
-                    })}
-                </div>
+                    })}              
+                </div> */}
+                <AnalyticsCard/>
 
                 {/* Users Management Section */}
                 <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl shadow-2xl">
@@ -893,7 +896,8 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Jobs Management Section */}
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl shadow-2xl">
+                <JobManagement/>
+                {/* <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl shadow-2xl">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center space-x-3">
                             <div className="h-10 w-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
@@ -1007,7 +1011,7 @@ const AdminDashboard = () => {
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> */}
             </div>
         </div>
     );

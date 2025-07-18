@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import JobCard from '../components/JobCard';
-import UploadResume from '../components/UploadResume';
+import JobCard from '../components/student/JobCard';
+import UploadResume from '../components/student/UploadResume';
 import StudentAnalytics from '../components/student/StudentAnalytics';
 import ProfileSection from '../components/student/ProfileSection';
 import LogoutButton from '../components/LogoutButton';
@@ -58,20 +58,20 @@ const StudentDashboard = () => {
         const matchingPayload = {
           skills: userSkills,
           jobs: allJobs.map(job => ({
-            id: job._id,
-            required_skills: job.skills || [],
+            _id: job._id,
+            requiredSkills: job.requiredSkills || [],
           }))
         };
+
 
         const matchRes = await axios.post(
           `${process.env.REACT_APP_ML_API_URL}/match_jobs`,
           matchingPayload
         );
-
         const matchedJobs = allJobs.filter(job =>
-          matchRes.data.matches.some(match => match.jobId === job._id)
+          matchRes.data.matches.filter(tj=>tj._id===job._id)
         );
-
+        
         setJobs(matchedJobs);
 
       } catch (err) {
@@ -148,6 +148,7 @@ const StudentDashboard = () => {
     if (status === 'all') {
       setFilteredJobs(appliedJobs);
       setStatusFilter(null);
+      // console.log("applied jobs anurag ",appliedJobs);
     } else {
       setFilteredJobs(appliedJobs.filter(job => job.status === status));
       setStatusFilter(status);
@@ -244,7 +245,7 @@ const StudentDashboard = () => {
                         </h3>
                         <p className="text-gray-300">
                           {jobExists
-                            ? (application.job.recruiter?.company || 'Unknown Company')
+                            ? application.job.companyName
                             : 'Unknown Company'}
                         </p>
                         <p className="text-gray-400 text-sm mt-2">
@@ -262,7 +263,7 @@ const StudentDashboard = () => {
                         </span>
                         <div className="text-sm text-gray-300 mt-2">
                           <p>Recruiter: {jobExists
-                            ? (application.job.recruiter?.name || 'N/A')
+                            ? (application.job.recruiterName || 'N/A')
                             : 'N/A'}</p>
                         </div>
                       </div>

@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
-
+import { useParams } from 'react-router-dom';
 const JobDetails = ({ jobId, onClose }) => {
     const { currentUser } = useAuth();
     const [job, setJob] = useState(null);
@@ -72,6 +72,7 @@ const JobDetails = ({ jobId, onClose }) => {
                 // Fetch application if user is logged in
                 if (currentUser) {
                     try {
+                        console.log('Checking application for jobId:', jobId);
                         const appRes = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/applications/check`, {
                             params: { jobId },
                             headers: {
