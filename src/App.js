@@ -10,6 +10,7 @@ import StudentApplicationsManager from './components/student/StudentApplications
 import ForgotPassword from './components/login/ForgotPassword';
 import ResetPassword from './components/login/ResetPassword';
 import Signup from './pages/Signup';
+import HomePage from './pages/HomePage';
 
 const DashboardRouter = () => {
   const { currentUser } = useAuth();
@@ -39,10 +40,11 @@ function App() {
       <AuthProvider>
         <div className="min-h-screen bg-gray-50">
           <Routes>
+            <Route path='/' element={<HomePage/>}/>
             <Route path="/login" element={<Login />} />
             <Route path="/Signup" element={<Signup />} />
             <Route
-              path="/"
+              path="/dashboard"
               element={
                 <PrivateRoute>
                   <DashboardRouter />

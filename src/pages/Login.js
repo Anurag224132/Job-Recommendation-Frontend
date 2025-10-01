@@ -20,7 +20,7 @@ const Login = () => {
       const response = await login(email, password);
 
       if (response.success) {
-        navigate('/');
+        navigate('/dashboard');
       } else {
         setError(response.error || 'Login failed');
       }
@@ -47,6 +47,9 @@ const Login = () => {
       <div className="relative z-10 max-w-md w-full space-y-8 animate-slide-fade">
         {/* Logo and Header */}
         <div className="text-center">
+          <Link to="/" className="text-2xl font-bold text-slate-600 hover:text-purple-600 transition-colors duration-300 mb-4 block">
+            SkillSpark
+          </Link>
           <div className="mx-auto h-16 w-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mb-6 shadow-lg animate-bounce-slow">
             <span className="text-2xl">🔑</span>
           </div>
@@ -93,9 +96,17 @@ const Login = () => {
 
             {/* Password */}
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
-                Password
-              </label>
+                <div className="flex items-center justify-between">
+                    <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
+                        Password
+                    </label>
+                    <div className="text-sm">
+                        <Link to="/forgot-password" 
+                        className="font-medium text-blue-600 hover:text-blue-500">
+                            Forgot your password?
+                        </Link>
+                    </div>
+                </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <span className="text-gray-400">🔒</span>
@@ -188,3 +199,4 @@ const Login = () => {
 };
 
 export default Login;
+

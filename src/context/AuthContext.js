@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext, useCallback } from 'react';
+import { createContext, useState, useEffect, useContext, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,6 +14,53 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [initialCheckComplete, setInitialCheckComplete] = useState(false);
   const navigate = useNavigate();
+  const inactivityTimer = useRef(null);
+
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    setToken(null);
+    setCurrentUser(null);
+    // Clear the timer on explicit logout
+    if (inactivityTimer.current) {
+        clearTimeout(inactivityTimer.current);
+    }
+    navigate('/');
+  }, [navigate]);
+
+  const resetInactivityTimer = useCallback(() => {
+    // Clear the previous timer
+    if (inactivityTimer.current) {
+      clearTimeout(inactivityTimer.current);
+    }
+    // Set a new timer for 1 hour (3600000 milliseconds)
+    inactivityTimer.current = setTimeout(() => {
+      // alert("You have been logged out due to inactivity."); // Optional: alert the user
+      logout();
+    }, 3600000); 
+  }, [logout]);
+
+  useEffect(() => {
+    // List of events that indicate user activity
+    const activityEvents = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+
+    // If a user is logged in, start the inactivity timer
+    if (currentUser) {
+      resetInactivityTimer();
+      activityEvents.forEach(event => {
+        window.addEventListener(event, resetInactivityTimer);
+      });
+    }
+
+    // Cleanup function to remove event listeners and clear the timer
+    return () => {
+      activityEvents.forEach(event => {
+        window.removeEventListener(event, resetInactivityTimer);
+      });
+      if (inactivityTimer.current) {
+        clearTimeout(inactivityTimer.current);
+      }
+    };
+  }, [currentUser, resetInactivityTimer]);
 
   const verifyToken = useCallback(async () => {
     const tokenInStorage = localStorage.getItem('token');
@@ -39,14 +86,12 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       console.error('Token verification failed:', error);
-      localStorage.removeItem('token');
-      setToken(null);
-      setCurrentUser(null);
+      logout(); // Use the unified logout function
     } finally {
       setLoading(false);
       setInitialCheckComplete(true);
     }
-  }, []);
+  }, [logout]);
 
   useEffect(() => {
     verifyToken();
@@ -67,13 +112,6 @@ export function AuthProvider({ children }) {
       console.error('Login failed:', error);
       throw error;
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    setCurrentUser(null);
-    navigate('/login');
   };
 
   const value = {
