@@ -34,7 +34,7 @@ const AppliedJobsList = ({ appliedJobs, loading, onJobClick }) => {
     // Only proceed if job exists
     if (application.job) {
       onJobClick(application.job);
-      navigate(`/jobs/${application.job._id}`);
+      navigate(`/jobs/${application.job.id || application.job._id}`);
     }
   };
 
@@ -60,7 +60,7 @@ const AppliedJobsList = ({ appliedJobs, loading, onJobClick }) => {
 
             return (
               <div
-                key={application._id}
+                key={application.id || application._id}
                 onClick={() => jobExists && handleJobClick(application)}
                 className={`p-4 rounded-2xl backdrop-blur-sm border ${jobExists
                     ? "bg-gradient-to-r from-indigo-900/30 to-purple-900/30 border-indigo-500/30 hover:border-cyan-400/50 hover:shadow-lg hover:shadow-cyan-500/20 transition cursor-pointer"

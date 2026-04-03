@@ -25,7 +25,8 @@ const JobManagement = () => {
                 { headers }
             );
 
-            setJobs(response.data);
+            const jobsArray = Array.isArray(response.data?.content) ? response.data.content : (Array.isArray(response.data) ? response.data : []);
+            setJobs(jobsArray);
             setError(null);
         } catch (err) {
             console.error('Error loading jobs:', err);
@@ -62,7 +63,7 @@ const JobManagement = () => {
 
     const handleViewJobDetails = (job) => {
         setSelectedJob(job);
-        fetchJobDetails(job._id);
+        fetchJobDetails(job.id || job._id);
     };
 
     const handleCloseModal = () => {
@@ -79,7 +80,7 @@ const JobManagement = () => {
                 `${process.env.REACT_APP_API_BASE_URL}/api/admin/jobs/${jobId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            setJobs(jobs.filter(job => job._id !== jobId));
+            setJobs(jobs.filter(job => (job.id || job._id) !== jobId));
             handleCloseModal();
         } catch (err) {
             console.error(err);

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import JobCard from './JobCard'
+import JobCard from './JobCard';
+import JobDetails from './JobDetails';
 import { useNavigate } from 'react-router-dom';
 
 const RecentJobsPage = () => {
   const [recentJobs, setRecentJobs] = useState([]);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [showJobDetails, setShowJobDetails] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -11,10 +14,16 @@ const RecentJobsPage = () => {
     setRecentJobs(viewed);
   }, []);
 
-  const handleRemoveJob = (jobId) => {
-    const updatedJobs = recentJobs.filter(job => job._id !== jobId);
+  const handleRemoveJob = (e, jobId) => {
+    e.stopPropagation();
+    const updatedJobs = recentJobs.filter(job => (job.id || job._id) !== jobId);
     setRecentJobs(updatedJobs);
     localStorage.setItem('recentJobs', JSON.stringify(updatedJobs));
+  };
+  
+  const handleJobClick = (job) => {
+    setSelectedJob(job);
+    setShowJobDetails(true);
   };
 
   const handleClearAll = () => {
@@ -40,7 +49,7 @@ const RecentJobsPage = () => {
                     Clear All
                   </button>
                   <button
-                    onClick={() => navigate('/student/dashboard')}
+                    onClick={() => navigate('/dashboard')}
                     className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-full font-semibold hover:from-emerald-600 hover:to-cyan-600 transition transform hover:scale-105 active:scale-95"
                   >
                     Back to Dashboard
@@ -50,10 +59,14 @@ const RecentJobsPage = () => {
 
               <div className="space-y-6">
                 {recentJobs.map((job) => (
-                  <div key={job._id} className="relative group">
-                    <JobCard job={job} userSkills={[]} />
+                  <div key={job.id || job._id} className="relative group">
+                    <JobCard 
+                      job={job} 
+                      userSkills={[]} 
+                      onJobClick={handleJobClick}
+                    />
                     <button
-                      onClick={() => handleRemoveJob(job._id)}
+                      onClick={(e) => handleRemoveJob(e, job.id || job._id)}
                       className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       title="Remove"
                     >
@@ -68,7 +81,7 @@ const RecentJobsPage = () => {
               <div className="text-6xl mb-4">📂</div>
               <p className="text-gray-300 text-lg">No recently viewed jobs available.</p>
               <button
-                onClick={() => navigate('/student/dashboard')}
+                onClick={() => navigate('/dashboard')}
                 className="mt-6 px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-full font-semibold hover:from-emerald-600 hover:to-cyan-600 transition transform hover:scale-105 active:scale-95"
               >
                 Back to Dashboard
@@ -77,6 +90,17 @@ const RecentJobsPage = () => {
           )}
         </div>
       </div>
+      
+      {showJobDetails && selectedJob && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-lg z-50 flex items-center justify-center p-4">
+          <div className="relative max-w-4xl w-full">
+            <JobDetails
+              jobId={selectedJob.id || selectedJob._id}
+              onClose={() => setShowJobDetails(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

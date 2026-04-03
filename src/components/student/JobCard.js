@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 
-const JobCard = ({ job, userSkills = [], onJobClick }) => {
+const JobCard = ({ job, userSkills = [], onJobClick, preCalculatedFitScore }) => {
 
   const { currentUser } = useAuth();
   const [fitScore, setFitScore] = useState(null);
@@ -12,18 +12,20 @@ const JobCard = ({ job, userSkills = [], onJobClick }) => {
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
-    if (userSkills.length > 0) {
+    if (preCalculatedFitScore !== undefined && preCalculatedFitScore !== null) {
+      setFitScore(preCalculatedFitScore);
+    } else if (userSkills.length > 0) {
       calculateFitScore();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userSkills]);
+  }, [userSkills, preCalculatedFitScore]);
 
   const calculateFitScore = async () => {
     setIsLoading(true);
     try {
       const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/applications/calculate-fit`, {
         resumeSkills: userSkills,
-        jobId: job._id,
+        jobId: job.id || job._id,
       });
       setFitScore(res.data.score);
     } catch (err) {
@@ -36,7 +38,7 @@ const JobCard = ({ job, userSkills = [], onJobClick }) => {
   const handleApply = async (e) => {
     e.stopPropagation();
 
-    if (!currentUser?._id) {
+    if (!(currentUser?.id || currentUser?._id)) {
       alert('Please log in to apply for jobs');
       return;
     }
@@ -55,18 +57,11 @@ const JobCard = ({ job, userSkills = [], onJobClick }) => {
 
       const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/applications`,
         {
-          jobId: job._id,
-          fitScore: fitScore
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
+          jobId: job.id || job._id
         }
       );
 
-      if (response.data && response.data.application) {
+      if (response.data && response.data.id) {
         setApplied(true);
         alert('✅ Application submitted successfully!');
       } else {
@@ -96,14 +91,17 @@ const JobCard = ({ job, userSkills = [], onJobClick }) => {
     return 'Fair Match';
   };
 
-  const togglePopup = (e) => {
-    e.stopPropagation();
-    setShowPopup(!showPopup);
-  };
-
   const handleViewJob = () => {
     if (typeof onJobClick === 'function') {
       onJobClick(job);
+    }
+  };
+
+  const togglePopup = (e) => {
+    e.stopPropagation();
+    setShowPopup(!showPopup);
+    if (!showPopup) { // Only track when opening
+       handleViewJob();
     }
   };
 

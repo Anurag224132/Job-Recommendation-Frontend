@@ -1,7 +1,6 @@
-// src/pages/Signup.js
 import { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import api from '../../utils/api';
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -14,8 +13,6 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;// || 'http://localhost:5000';
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -35,7 +32,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, { name, email, password, role });
+      const response = await api.post('/api/auth/register', { name, email, password, role });
       if (response.data.nextStep === 'verify-otp') {
         setStep('verify');
       } else {
@@ -59,11 +56,11 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/verify-otp`, { email, otp, name, password, role });
+      const response = await api.post('/api/auth/verify-otp', { email, otp, name, password, role });
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         alert('Registration successful! You are now logged in.');
-        navigate(`/${role}/dashboard`);
+        navigate(`/${role.toLowerCase()}/dashboard`);
       }
     } catch (err) {
       setError(
@@ -81,7 +78,7 @@ const Signup = () => {
     setError('');
     setLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/api/auth/resend-otp`, { email });
+      await api.post('/api/auth/resend-otp', { email });
       alert('OTP resent to your email.');
     } catch (err) {
       setError(

@@ -1,4 +1,4 @@
-// components/login/ForgotPasswordModal.js
+// src/components/auth/ForgotPasswordModal.js
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 

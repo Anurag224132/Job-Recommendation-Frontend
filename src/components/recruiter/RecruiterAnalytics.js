@@ -49,12 +49,12 @@ const RecruiterAnalytics = () => {
         );
     }
 
-    const totalApplications = jobs.reduce((acc, job) => acc + (job.applications || 0), 0);
+    const totalApplications = jobs.reduce((acc, job) => acc + (job.applicationCount || 0), 0);
     const averageApplications = (totalApplications / jobs.length).toFixed(1);
 
     const chartData = jobs.map(job => ({
         name: job.title.length > 20 ? job.title.substring(0, 20) + '...' : job.title,
-        Applications: job.applications || 0,
+        Applications: job.applicationCount || 0,
     }));
 
     return (
