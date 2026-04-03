@@ -1,14 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import LogoutButton from '../components/LogoutButton';
-import JobManagement from '../components/Admin/JobManagement';
-import AnalyticsCard from '../components/Admin/AnalyticsCard';
+import LogoutButton from '../components/common/LogoutButton';
+import JobManagement from '../components/admin/JobManagement';
+import AnalyticsCard from '../components/admin/AnalyticsCard';
 const AdminDashboard = () => {
-    const [metrics, setMetrics] = useState({});
-    const [users, setUsers] = useState([]);
-    const [jobs, setJobs] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [activeUserTab, setActiveUserTab] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedUser, setSelectedUser] = useState(null);
@@ -17,29 +12,41 @@ const AdminDashboard = () => {
     const [jobDetails, setJobDetails] = useState(null);
     const [detailsLoading, setDetailsLoading] = useState(false);
 
-    const fetchAdminData = async () => {
-        try {
-            setLoading(true);
-            const token = localStorage.getItem('token');
-            const headers = { Authorization: `Bearer ${token}` };
-
+    // Use React Query for fetching admin dashboard data
+    const {
+        data: adminData,
+        isLoading: loading,
+        error: fetchError,
+        refetch: fetchAdminData
+    } = useQuery({
+        queryKey: ['adminDashboardData'],
+        queryFn: async () => {
             const [metricsRes, usersRes, jobsRes] = await Promise.all([
-                axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/metrics`, { headers }),
-                axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/users`, { headers }),
-                axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/jobs`, { headers }),
+                api.get('/api/admin/metrics'),
+                api.get('/api/admin/users'),
+                api.get('/api/admin/jobs'),
             ]);
 
-            setMetrics(metricsRes.data);
-            setUsers(usersRes.data);
-            setJobs(jobsRes.data);
-            setError(null);
-        } catch (err) {
-            console.error('Error loading admin data:', err);
-            setError(err.response?.data?.message || 'Failed to load data. Check console for details.');
-        } finally {
-            setLoading(false);
-        }
-    };
+            const usersArray = usersRes.data?.content || (Array.isArray(usersRes.data) ? usersRes.data : []);
+            const jobsArray = jobsRes.data?.content || (Array.isArray(jobsRes.data) ? jobsRes.data : []);
+
+            return {
+                metrics: metricsRes.data,
+                users: usersArray,
+                jobs: jobsArray
+            };
+        },
+        retry: 1
+    });
+
+    const metrics = adminData?.metrics || {};
+    const users = adminData?.users || [];
+    const jobs = adminData?.jobs || [];
+    const error = fetchError?.response?.data?.message || fetchError?.message || null;
+
+    useEffect(() => {
+        // Initial fetch handled by useQuery
+    }, []);
 
     const fetchUserAnalytics = useCallback(async (userId) => {
         try {
@@ -128,14 +135,14 @@ const AdminDashboard = () => {
         setSelectedJob(null);
         setJobDetails(null);
         setSelectedUser(user);
-        fetchUserAnalytics(user._id);
+        fetchUserAnalytics(user.id || user._id);
     };
 
     // const handleViewJobDetails = (job) => {
     //     setSelectedUser(null);
     //     setUserAnalytics(null);
     //     setSelectedJob(job);
-    //     fetchJobDetails(job._id);
+    //     fetchJobDetails(job.id || job._id);
     // };
 
     const handleCloseModal = () => {
@@ -153,7 +160,7 @@ const AdminDashboard = () => {
             await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/admin/users/${userId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setUsers(users.filter(user => user._id !== userId));
+            setUsers(users.filter(user => (user.id || user._id) !== userId));
             handleCloseModal();
         } catch (err) {
             console.error(err);
@@ -170,7 +177,7 @@ const AdminDashboard = () => {
             );
 
             setUsers(users.map(user =>
-                user._id === userId ? { ...user, role: newRole } : user
+                (user.id || user._id) === userId ? { ...user, role: newRole } : user
             ));
 
             alert('Role updated successfully!');
@@ -187,7 +194,7 @@ const AdminDashboard = () => {
             await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/admin/jobs/${jobId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setJobs(jobs.filter(job => job._id !== jobId));
+            setJobs(jobs.filter(job => (job.id || job._id) !== jobId));
             handleCloseModal();
         } catch (err) {
             console.error(err);
@@ -285,7 +292,7 @@ const AdminDashboard = () => {
                                                     {selectedUser.role?.toUpperCase() || 'UNKNOWN'}
                                                 </span>
                                                 <button 
-                                                    onClick={() => handleDeleteUser(selectedUser._id)}
+                                                    onClick={() => handleDeleteUser(selectedUser.id || selectedUser._id)}
                                                     className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-300 px-2 py-1 rounded-full transition-colors"
                                                 >
                                                     Delete User
@@ -490,7 +497,7 @@ const AdminDashboard = () => {
                                         <div className="flex items-center space-x-4">
                                             <select
                                                 value={selectedUser.role}
-                                                onChange={(e) => handleChangeUserRole(selectedUser._id, e.target.value)}
+                                                onChange={(e) => handleChangeUserRole(selectedUser.id || selectedUser._id, e.target.value)}
                                                 className="bg-slate-800/50 border border-white/20 px-4 py-2 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 transition-all duration-200"
                                             >
                                                 <option value="student">Student</option>
@@ -528,7 +535,7 @@ const AdminDashboard = () => {
                                             </div>
                                         </div>
                                         <button
-                                            onClick={() => handleDeleteJob(selectedJob._id)}
+                                            onClick={() => handleDeleteJob(selectedJob.id || selectedJob._id)}
                                             className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-300 px-3 py-2 rounded-lg transition-colors"
                                         >
                                             Delete Job
@@ -831,7 +838,7 @@ const AdminDashboard = () => {
                             <tbody className="divide-y divide-white/10">
                                 {filteredUsers.length > 0 ? (
                                     filteredUsers.map((user) => (
-                                        <tr key={user._id} className="hover:bg-white/5 transition-colors duration-200 group">
+                                        <tr key={user.id || user._id} className="hover:bg-white/5 transition-colors duration-200 group">
                                             <td className="p-4">
                                                 <div className="flex items-center space-x-3">
                                                     <div className="h-8 w-8 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center text-white font-semibold text-sm">
@@ -862,7 +869,7 @@ const AdminDashboard = () => {
                                                         <span>Details</span>
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDeleteUser(user._id)}
+                                                        onClick={() => handleDeleteUser(user.id || user._id)}
                                                         className="group/btn bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 px-3 py-2 rounded-lg text-xs font-medium border border-red-500/30 hover:border-red-500/50 transition-all duration-200 flex items-center space-x-1"
                                                     >
                                                         <svg className="h-3 w-3 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -872,7 +879,7 @@ const AdminDashboard = () => {
                                                     </button>
                                                     <select
                                                         value={user.role}
-                                                        onChange={(e) => handleChangeUserRole(user._id, e.target.value)}
+                                                        onChange={(e) => handleChangeUserRole(user.id || user._id, e.target.value)}
                                                         className="bg-slate-800/50 border border-white/20 px-3 py-2 rounded-lg text-xs text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 transition-all duration-200"
                                                     >
                                                         <option value="student">Student</option>

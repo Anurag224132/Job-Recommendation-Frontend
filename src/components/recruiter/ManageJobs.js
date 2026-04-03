@@ -1,6 +1,7 @@
 // src/components/recruiter/ManageJobs.js
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import Pagination from '../common/Pagination';
 
 const ManageJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -9,11 +10,23 @@ const ManageJobs = () => {
   const [showModal, setShowModal] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState(null);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const fetchJobs = async () => {
     const token = localStorage.getItem('token');
-    const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/jobs/myjobs`, { headers: { Authorization: `Bearer ${token}` } });
-    setJobs(res.data);
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/jobs/my-jobs?page=${page}&size=10`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = res.data;
+      const jobsArray = data?.content || data || [];
+      setTotalPages(data?.totalPages || 0);
+      setJobs(jobsArray);
+    } catch (err) {
+      console.error('Error fetching jobs:', err);
+      setJobs([]);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -26,9 +39,16 @@ const ManageJobs = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setJobs(prevJobs => prevJobs.filter(job => job._id.toString() !== id.toString()));
+      setJobs(prevJobs => prevJobs.filter(job => job.id.toString() !== id.toString()));
+      // If the page is now empty and not on the first page, go back a page
+      if (jobs.length === 1 && page > 0) {
+        setPage(page - 1);
+      } else {
+        fetchJobs(); // Refresh to get next item from next page if any
+      }
+      
       // Close modal if deleting the currently viewed job
-      if (selectedJob && selectedJob._id === id) {
+      if (selectedJob && selectedJob.id === id) {
         setShowModal(false);
       }
     } catch (err) {
@@ -43,11 +63,14 @@ const ManageJobs = () => {
   };
 
   const openEditJobModal = (job) => {
-    setEditFormData({ ...job });
+    setEditFormData({ 
+      ...job, 
+      requiredSkills: Array.isArray(job.requiredSkills) ? job.requiredSkills : []
+    });
     setEditModalOpen(true);
   };
 
-  useEffect(() => { fetchJobs(); }, []);
+  useEffect(() => { fetchJobs(); }, [page]);
 
   return (
     <div className="bg-gradient-to-br from-white to-slate-50 p-8 rounded-3xl shadow-2xl border border-slate-200/50 relative overflow-hidden">
@@ -85,7 +108,7 @@ const ManageJobs = () => {
           <div className="space-y-6">
             {jobs.map((job, index) => (
               <div
-                key={job._id}
+                key={job.id}
                 className="group bg-gradient-to-r from-white/80 to-slate-50/80 border border-slate-200/50 p-6 rounded-2xl hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm relative overflow-hidden cursor-pointer"
                 style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => openJobDetails(job)}
@@ -160,7 +183,7 @@ const ManageJobs = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDelete(job._id);
+                        handleDelete(job.id);
                       }}
                       className="group/btn bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white px-4 py-2.5 rounded-xl font-medium transition-all duration-200 shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 active:scale-95 flex items-center gap-2"
                     >
@@ -189,6 +212,12 @@ const ManageJobs = () => {
                 </div>
               </div>
             ))}
+            
+            <Pagination 
+              currentPage={page} 
+              totalPages={totalPages} 
+              onPageChange={(newPage) => setPage(newPage)} 
+            />
           </div>
         )}
 
@@ -336,10 +365,22 @@ const ManageJobs = () => {
                 onSubmit={async (e) => {
                   e.preventDefault();
                   const token = localStorage.getItem('token');
+                  const updateData = {
+                    title: editFormData.title,
+                    description: editFormData.description,
+                    location: editFormData.location,
+                    salary: editFormData.salary,
+                    type: editFormData.type,
+                    experience: editFormData.experience,
+                    remote: editFormData.remote,
+                    companyName: editFormData.companyName,
+                    requiredSkills: editFormData.requiredSkills,
+                    isActive: editFormData.isActive
+                  };
                   try {
                     await axios.put(
-                      `${process.env.REACT_APP_API_BASE_URL}/api/jobs/${editFormData._id}`,
-                      editFormData,
+                      `${process.env.REACT_APP_API_BASE_URL}/api/recruiter/jobs/${editFormData.id}`,
+                      updateData,
                       { headers: { Authorization: `Bearer ${token}` } }
                     );
                     setEditModalOpen(false);
@@ -362,20 +403,56 @@ const ManageJobs = () => {
                   placeholder="Description"
                   rows={4}
                 />
-                <input type="text" value={editFormData.location}
+                <input type="text" value={editFormData.companyName || ''}
+                  onChange={(e) => setEditFormData({ ...editFormData, companyName: e.target.value })}
+                  className="w-full p-2 border rounded"
+                  placeholder="Company Name"
+                />
+                <input type="text" value={editFormData.location || ''}
                   onChange={(e) => setEditFormData({ ...editFormData, location: e.target.value })}
                   className="w-full p-2 border rounded"
                   placeholder="Location"
                 />
-                <input type="text" value={editFormData.salary}
+                <div className="flex gap-4">
+                  <select 
+                    value={editFormData.type || ''} 
+                    onChange={(e) => setEditFormData({ ...editFormData, type: e.target.value })}
+                    className="w-1/2 p-2 border rounded"
+                  >
+                    <option value="">Job Type</option>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                  </select>
+                  <select 
+                    value={editFormData.experience || ''} 
+                    onChange={(e) => setEditFormData({ ...editFormData, experience: e.target.value })}
+                    className="w-1/2 p-2 border rounded"
+                  >
+                    <option value="">Experience Level</option>
+                    <option value="Entry">Entry Level</option>
+                    <option value="Mid">Mid Level</option>
+                    <option value="Senior">Senior Level</option>
+                  </select>
+                </div>
+                <input type="text" value={editFormData.salary || ''}
                   onChange={(e) => setEditFormData({ ...editFormData, salary: e.target.value })}
                   className="w-full p-2 border rounded"
                   placeholder="Salary"
                 />
-                <input type="text" value={editFormData.requiredSkills.join(', ')}
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="checkbox" 
+                    checked={editFormData.remote || false} 
+                    onChange={(e) => setEditFormData({ ...editFormData, remote: e.target.checked })}
+                    id="edit-remote"
+                  />
+                  <label htmlFor="edit-remote">Remote Position</label>
+                </div>
+                <input type="text" value={(editFormData.requiredSkills || []).join(', ')}
                   onChange={(e) => setEditFormData({ ...editFormData, requiredSkills: e.target.value.split(',').map(s => s.trim()) })}
                   className="w-full p-2 border rounded"
-                  placeholder="Required Skills"
+                  placeholder="Required Skills (comma separated)"
                 />
                 <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Save Changes</button>
               </form>

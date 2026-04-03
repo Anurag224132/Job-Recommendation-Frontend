@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const ResetPassword = () => {
-  const { token } = useParams();
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+const ForgotPassword = () => {
+  const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -13,20 +11,15 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      return setError('Passwords do not match');
-    }
-
     setLoading(true);
     try {
-      const res = await axios.put(
-        `${process.env.REACT_APP_API_BASE_URL}/api/auth/reset-password/${token}`,
-        { password }
-      );
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/forgot-password`, { email });
       setMessage(res.data.msg);
       setError('');
-      setTimeout(() => navigate('/login'), 3000);
+      // Navigate to reset password page after a small delay
+      setTimeout(() => {
+        navigate('/reset-password', { state: { email } });
+      }, 2000);
     } catch (err) {
       setError(err.response?.data?.msg || 'Something went wrong');
       setMessage('');
@@ -39,7 +32,7 @@ const ResetPassword = () => {
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Reset Password
+          Forgot Password
         </h2>
       </div>
 
@@ -58,36 +51,18 @@ const ResetPassword = () => {
           
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                New Password
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email address
               </label>
               <div className="mt-1">
                 <input
-                  id="password"
-                  name="password"
-                  type="password"
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
                   required
-                  minLength="8"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm New Password
-              </label>
-              <div className="mt-1">
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  minLength="8"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
               </div>
@@ -99,14 +74,23 @@ const ResetPassword = () => {
                 disabled={loading}
                 className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
-                {loading ? 'Resetting...' : 'Reset Password'}
+                {loading ? 'Sending...' : 'Send OTP'}
               </button>
             </div>
           </form>
+
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => navigate('/login')}
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Back to Login
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default ResetPassword;
+export default ForgotPassword;

@@ -5,58 +5,27 @@ import ManageJobs from '../components/recruiter/ManageJobs';
 import ViewApplicants from '../components/recruiter/ViewApplicants';
 import RecruiterAnalytics from '../components/recruiter/RecruiterAnalytics';
 import SkillGapAnalysis from '../components/recruiter/SkillGapAnalysis';
-import LogoutButton from '../components/LogoutButton';
+import LogoutButton from '../components/common/LogoutButton';
 import { useAuth } from '../context/AuthContext';
 
 const RecruiterDashboard = () => {
   const [view, setView] = useState('manage');
   const { currentUser } = useAuth();
-  const [analyticsData, setAnalyticsData] = useState([]);
-  const [skillGaps, setSkillGaps] = useState([]);
-  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
-  const [loadingSkillGaps, setLoadingSkillGaps] = useState(false);
+  // Use React Query for fetching global skill gap data
+  const {
+    data: skillGapsData,
+    isLoading: loadingSkillGaps,
+  } = useQuery({
+    queryKey: ['skillGaps'],
+    queryFn: async () => {
+      const res = await api.get('/api/recruiter/skill-gap');
+      return res.data.missingSkills || [];
+    },
+    enabled: view === 'skillgap',
+  });
 
-  const token = localStorage.getItem('token');
+  const skillGaps = skillGapsData || [];
 
-  // Fetch analytics data
-  useEffect(() => {
-    if (view === 'analytics') {
-      const fetchAnalytics = async () => {
-        setLoadingAnalytics(true);
-        try {
-          const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/analytics`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setAnalyticsData(res.data);
-        } catch (err) {
-          console.error('Error fetching analytics:', err.response?.data || err.message);
-        } finally {
-          setLoadingAnalytics(false);
-        }
-      };
-      fetchAnalytics();
-    }
-  }, [view, token]);
-
-  // Fetch skill gap data
-  useEffect(() => {
-    if (view === 'skillgap') {
-      const fetchSkillGaps = async () => {
-        setLoadingSkillGaps(true);
-        try {
-          const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/skill-gaps`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setSkillGaps(res.data.gaps || []);
-        } catch (err) {
-          console.error('Error fetching skill gaps:', err.response?.data || err.message);
-        } finally {
-          setLoadingSkillGaps(false);
-        }
-      };
-      fetchSkillGaps();
-    }
-  }, [view, token]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-4 md:p-6">
@@ -116,16 +85,11 @@ const RecruiterDashboard = () => {
             <PostJob onJobPosted={() => setView('manage')} />
           )}
           {view === 'applicants' && <ViewApplicants />}
-          {view === 'analytics' && (
-            <RecruiterAnalytics
-              data={analyticsData}
-              loading={loadingAnalytics}
-            />
-          )}
+          {view === 'analytics' && <RecruiterAnalytics />}
           {view === 'skillgap' && (
-            <SkillGapAnalysis
-              gaps={skillGaps}
-              loading={loadingSkillGaps}
+            <SkillGapAnalysis 
+              gaps={skillGaps} 
+              loading={loadingSkillGaps} 
             />
           )}
         </div>

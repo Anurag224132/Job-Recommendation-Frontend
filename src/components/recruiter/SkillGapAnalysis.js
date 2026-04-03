@@ -1,5 +1,13 @@
-// src/components/recruiter/SkillGapAnalysis.js
-const SkillGapAnalysis = ({ gaps }) => {
+const SkillGapAnalysis = ({ gaps, loading }) => {
+  if (loading) {
+    return (
+      <div className="bg-white/10 backdrop-blur-xl p-16 rounded-3xl border border-white/20 shadow-2xl text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+        <p className="text-white font-medium">Analyzing skill gaps...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gradient-to-br from-white to-slate-50 p-8 rounded-3xl shadow-2xl border border-slate-200/50 relative overflow-hidden">
       {/* Background decorations */}

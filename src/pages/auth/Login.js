@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
@@ -19,7 +19,7 @@ const Login = () => {
     try {
       const response = await login(email, password);
 
-      if (response.success) {
+      if (response.success || response.token) {
         navigate('/dashboard');
       } else {
         setError(response.error || 'Login failed');

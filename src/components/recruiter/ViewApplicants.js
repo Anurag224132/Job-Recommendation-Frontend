@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import Pagination from '../common/Pagination';
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const ViewApplicants = () => {
@@ -15,16 +16,20 @@ const ViewApplicants = () => {
     const [notes, setNotes] = useState('');
     const [emailStatus, setEmailStatus] = useState('');
     const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'pending', 'interview_scheduled', 'rejected'
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
     const token = localStorage.getItem('token');
 
     const fetchApplicants = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/applications/recruiter/${currentUser._id}`, {
+            const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/applications/recruiter/${currentUser.id || currentUser._id}?page=${page}&size=10`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setApplications(res.data);
-            setFilteredApplications(res.data);
+            const apps = res.data.content || res.data || [];
+            setTotalPages(res.data.totalPages || 0);
+            setApplications(apps);
+            setFilteredApplications(apps);
         } catch (err) {
             console.error('❌ Failed to fetch applicants:', err.response?.data || err.message);
         } finally {
@@ -103,7 +108,7 @@ const ViewApplicants = () => {
 
             // Update local state
             setApplications(prev => prev.map(app =>
-                app._id === appId ? { ...app, status: newStatus, notes } : app
+                (app.id || app._id) === appId ? { ...app, status: newStatus, notes } : app
             ));
         } catch (err) {
             console.error('❌ Failed to update status:', err.response?.data || err.message);
@@ -120,18 +125,18 @@ const ViewApplicants = () => {
 
         try {
             // Schedule interview and send email
-            const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/applications/${currentApplication._id}/schedule-interview`,
+            const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/applications/${currentApplication.id || currentApplication._id}/schedule-interview`,
                 { interviewDate },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
             // Update local state with interview details
             setApplications(prev => prev.map(app =>
-                app._id === currentApplication._id ? {
+                (app.id || app._id) === (currentApplication.id || currentApplication._id) ? {
                     ...app,
                     status: 'interview_scheduled',
-                    interviewDate: response.data.application.interviewDate,
-                    interviewLink: response.data.application.interviewLink
+                    interviewDate: response.data.application?.interviewDate || response.data.interviewDate,
+                    interviewLink: response.data.application?.interviewLink || response.data.interviewLink
                 } : app
             ));
 
@@ -162,7 +167,7 @@ const ViewApplicants = () => {
         if (currentUser?.role === 'recruiter') {
             fetchApplicants();
         }
-    }, [currentUser]);
+    }, [currentUser, page]);
 
     // Get counts for each status
     const getStatusCount = (status) => {
@@ -241,7 +246,7 @@ const ViewApplicants = () => {
                                     if (modalType === 'accept') {
                                         handleSendEmail();
                                     } else {
-                                        handleStatusChange(currentApplication._id, 'rejected', notes);
+                                        handleStatusChange(currentApplication.id || currentApplication._id, 'rejected', notes);
                                         handleCloseModal();
                                     }
                                 }}
@@ -383,7 +388,7 @@ const ViewApplicants = () => {
                         {/* Applications List */}
                         {filteredApplications.map((app, index) => (
                             <div
-                                key={app._id}
+                                key={app.id || app._id}
                                 className="group bg-gradient-to-r from-white/80 to-slate-50/80 border border-slate-200/50 p-6 rounded-2xl hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm relative overflow-hidden"
                                 style={{ animationDelay: `${index * 100}ms` }}
                             >
@@ -493,7 +498,7 @@ const ViewApplicants = () => {
                                                 Reject
                                             </button>
                                             <button
-                                                onClick={() => handleDownloadResume(app._id, app.user?.name || 'Resume')}
+                                                onClick={() => handleDownloadResume(app.id || app._id, app.user?.name || 'Resume')}
                                                 className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
                                             >
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -552,6 +557,12 @@ const ViewApplicants = () => {
                                 </div>
                             </div>
                         ))}
+                        
+                        <Pagination 
+                            currentPage={page} 
+                            totalPages={totalPages} 
+                            onPageChange={(newPage) => setPage(newPage)} 
+                        />
                     </div>
                 )}
             </div>

@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import adminpic from './accetsHomePage/admin.png';
-import appic from './accetsHomePage/app.png';
-import applicationpic from './accetsHomePage/applicationTracking.png';
-import recruiterpic from './accetsHomePage/recruiter.png';
-import resumeparsing from './accetsHomePage/resumeParsing.png';
-import studentpic from './accetsHomePage/student.png';
+import adminpic from '../assets/images/admin.png';
+import appic from '../assets/images/app.png';
+import applicationpic from '../assets/images/applicationTracking.png';
+import recruiterpic from '../assets/images/recruiter.png';
+import resumeparsing from '../assets/images/resumeParsing.png';
+import studentpic from '../assets/images/student.png';
 
 // Main Home Page Component
 const HomePage = () => {

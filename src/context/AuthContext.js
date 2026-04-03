@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useContext, useCallback, useRef } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import api from '../utils/api';
 
 const AuthContext = createContext();
 
@@ -10,7 +10,6 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
   const [initialCheckComplete, setInitialCheckComplete] = useState(false);
   const navigate = useNavigate();
@@ -18,32 +17,26 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(() => {
     localStorage.removeItem('token');
-    setToken(null);
     setCurrentUser(null);
-    // Clear the timer on explicit logout
     if (inactivityTimer.current) {
-        clearTimeout(inactivityTimer.current);
+      clearTimeout(inactivityTimer.current);
     }
     navigate('/');
   }, [navigate]);
 
   const resetInactivityTimer = useCallback(() => {
-    // Clear the previous timer
     if (inactivityTimer.current) {
       clearTimeout(inactivityTimer.current);
     }
     // Set a new timer for 1 hour (3600000 milliseconds)
     inactivityTimer.current = setTimeout(() => {
-      // alert("You have been logged out due to inactivity."); // Optional: alert the user
       logout();
     }, 3600000); 
   }, [logout]);
 
   useEffect(() => {
-    // List of events that indicate user activity
     const activityEvents = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
 
-    // If a user is logged in, start the inactivity timer
     if (currentUser) {
       resetInactivityTimer();
       activityEvents.forEach(event => {
@@ -51,7 +44,6 @@ export function AuthProvider({ children }) {
       });
     }
 
-    // Cleanup function to remove event listeners and clear the timer
     return () => {
       activityEvents.forEach(event => {
         window.removeEventListener(event, resetInactivityTimer);
@@ -71,22 +63,15 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/api/auth/user`,
-        {
-          headers: { Authorization: `Bearer ${tokenInStorage}` }
-        }
-      );
-      
-      if (res.data && (res.data._id || res.data.id)) {
+      const res = await api.get('/api/auth/user');
+      if (res.data && (res.data.id || res.data._id)) {
         setCurrentUser(res.data);
-        setToken(tokenInStorage);
       } else {
-        throw new Error('Invalid user data received');
+        throw new Error('Invalid user data');
       }
     } catch (error) {
-      console.error('Token verification failed:', error);
-      logout(); // Use the unified logout function
+      console.error('Session expired or invalid:', error.message);
+      logout();
     } finally {
       setLoading(false);
       setInitialCheckComplete(true);
@@ -99,13 +84,8 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const res = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/api/auth/login`,
-        { email, password }
-      );
-
+      const res = await api.post('/api/auth/login', { email, password });
       localStorage.setItem('token', res.data.token);
-      setToken(res.data.token);
       setCurrentUser(res.data.user);
       return res.data;
     } catch (error) {
@@ -116,7 +96,6 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
-    token,
     login,
     logout,
     loading,

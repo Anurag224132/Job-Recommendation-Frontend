@@ -1,4 +1,4 @@
-// src/components/Admin/AnalyticsCard.js
+// src/components/admin/AnalyticsCard.js
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import {

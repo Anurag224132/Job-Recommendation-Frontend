@@ -11,7 +11,7 @@ const StudentAnalytics = ({ appliedJobs, loading, onStatusClick }) => {
 
   // Calculate average fit score
   const avgFit = total > 0
-    ? (validJobs.reduce((sum, job) => sum + (job.fitScore || 0), 0) / total).toFixed(2)
+    ? (validJobs.reduce((sum, job) => sum + (Number(job.fitScore) || 0), 0) / total).toFixed(2)
     : 0;
 
   // Calculate success rate
